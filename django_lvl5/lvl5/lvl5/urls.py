@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^lvl5_App/',include('lvl5_App.urls')),
     url(r'^logout/',views.user_logout,name='logout'),
     url(r'^special/',views.special,name='special'),
+    url('accounts/', include('allauth.urls')),
 ]

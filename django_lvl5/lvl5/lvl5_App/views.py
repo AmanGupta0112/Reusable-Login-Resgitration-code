@@ -43,9 +43,13 @@ def register(request):
                 profile.profile_pic = request.FILES['profile_pic']
 
             profile.save()
+            mobile = request.POST.get('mobile_no')
 
-            registered = True
-
+            if mobile :
+                OTP = generate_otp(mobile)
+                otp = request.POST.get('otp')
+                if OTP == otp:
+                    registered =  True
         else:
             print(user_form.errors,profile_form.errors)
 
@@ -60,7 +64,6 @@ def user_login(request):
         # gets the value from the login.html
         username = request.POST.get('username')
         password = request.POST.get('password')
-        # user authentication by django builtin function
         user = authenticate(username = username , password = password)
 
         if user:
@@ -76,3 +79,20 @@ def user_login(request):
             return HttpResponse("Invalid Detail!")
     else:
         return  render(request,'lvl5_App/login.html',{})
+
+def generate_otp(mobile):
+    import random,string,requests
+
+    Otp = ''.join([random.choice(string.digits) for n in range(6)])
+    url = "https://www.fast2sms.com/dev/bulk"
+
+    payload = "sender_id=FSTSMS&message=Your%20OTP%20is%20{}&language=english&route=p&numbers={}".format(Otp,mobile)
+    headers = {
+        'authorization': "ogilVNPTfbFwBLan9QOuhKEpA8Y7y5M1vecDztC3UH2kRWdxsqQXjbW9sYBtr1ocd7aFTg0LkHqZNASV",
+        'Content-Type': "application/x-www-form-urlencoded",
+        'Cache-Control': "no-cache",
+        }
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+
+    return Otp
